@@ -19,4 +19,5 @@ ENV LANG=zh_CN.UTF-8
 ENV LC_ALL=zh_CN.UTF-8
 
 EXPOSE 8080
+RUN chmod +x /opt/loonflow/entrypoint.sh
 ENTRYPOINT ["./entrypoint.sh"]
