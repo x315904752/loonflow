@@ -32,7 +32,7 @@ DATABASES = {
             'PORT': MYSQL_PORT,  # Set to empty string for default. Not used with sqlite3.
         }
 }
-
+print(MYSQL_PORT)
 if REDIS_PASSWORD:
     CELERY_BROKER_URL = 'redis://:{}@{}:{}/1'.format(REDIS_PASSWORD, REDIS_HOST, REDIS_PORT)
 else:
