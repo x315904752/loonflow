@@ -29,4 +29,3 @@ REDIS_HOST = getvalue_from_env('REDIS_HOST', 'redis', 'REDIS_HOST', '127.0.0.1')
 REDIS_PORT = getvalue_from_env('REDIS_PORT', 'redis', 'REDIS_PORT', 6379)
 REDIS_DB = getvalue_from_env('REDIS_DB', 'redis', 'REDIS_DB', 0)
 REDIS_PASSWORD = getvalue_from_env('REDIS_PASSWORD', 'redis', 'REDIS_PASSWORD', '')
-
