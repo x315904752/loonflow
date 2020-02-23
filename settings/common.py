@@ -149,13 +149,8 @@ TIME_FORMAT = 'H:i:s'
 LOGIN_URL = '/account/login/'
 AUTH_USER_MODEL = 'account.LoonUser'
 
-STATIC_URL = '/static/'
-
-
 FIXTURE_DIRS = ['fixtures/']
 STATIC_FILES_VERSION = '1.0'
-
-LOGIN_URL = '/manage/login'
 
 APPEND_SLASH = False  # disable urls.W002 warning
 
