@@ -17,7 +17,7 @@ ALLOWED_HOSTS = ['*']
 
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/media/'
+MEDIA_URL = '/loonflow-media/'
 
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
