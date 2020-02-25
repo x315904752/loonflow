@@ -7,6 +7,38 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from service.account.account_base_service import AccountBaseService
 from service.format_response import api_response
+from rest_framework import mixins, viewsets
+from rest_framework.response import Response
+
+from apps.account.serializers import LoonUserSerializer
+from apps.account.models import LoonUser
+
+
+class CreateUserViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet):
+    queryset = LoonUser.objects.all()
+    serializer_class = LoonUserSerializer
+
+    def list(self, request, *args, **kwargs):
+        auth_key = self.request.query_params.get('auth_key', None)
+        if auth_key == '7816f554-f380-11e8-be96-0242ac110002':
+            queryset = self.filter_queryset(self.get_queryset())
+
+            page = self.paginate_queryset(queryset)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data)
+        else:
+            return Response('params error')
+
+    def perform_create(self, serializer):
+        auth_key = self.request.query_params.get('auth_key', None)
+        if auth_key == '7816f554-f380-11e8-be96-0242ac110002':
+            serializer.save()
+        else:
+            return Response('params error')
 
 
 @method_decorator(login_required, name='dispatch')
