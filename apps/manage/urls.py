@@ -2,7 +2,7 @@ from django.urls import path
 from apps.manage.views import *
 
 urlpatterns = [
-    path('', index),
+    path('/', index),
     path('/login', user_login_view),
     path('/doc', doc_view),
     path('/user_manage', user_manage_view),

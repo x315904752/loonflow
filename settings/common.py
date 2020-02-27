@@ -147,7 +147,7 @@ TIME_FORMAT = 'H:i:s'
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 
-LOGIN_URL = '/account/login/'
+LOGIN_URL = '/manage/login'
 AUTH_USER_MODEL = 'account.LoonUser'
 
 FIXTURE_DIRS = ['fixtures/']
