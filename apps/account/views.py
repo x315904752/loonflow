@@ -10,8 +10,8 @@ from service.format_response import api_response
 from rest_framework import mixins, viewsets
 from rest_framework.response import Response
 
-from apps.account.serializers import LoonUserSerializer
-from apps.account.models import LoonUser
+from apps.account.serializers import LoonUserSerializer, AppTokenSerializer
+from apps.account.models import LoonUser, AppToken
 
 
 class CreateUserViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet):
@@ -39,6 +39,23 @@ class CreateUserViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, viewsets
             serializer.save()
         else:
             return Response('params error')
+
+
+class AddWorkFlowIdToAppTokenViewSet(viewsets.ViewSet):
+
+    def post(self, request):
+        auth_key = self.request.query_params.get('auth_key', None)
+        if auth_key == '7816f554-f380-11e8-be96-0242ac110002':
+            token_id = self.request.data.get('token_id', None)
+            workflow_id = self.request.data.get('workflow_id', None)
+            if token_id and workflow_id:
+                app_token_obj = AppToken.objects.filter(id__exact=int(token_id))
+                if app_token_obj:
+                    old_val = app_token_obj[0].workflow_ids
+                    app_token_obj[0].workflow_ids = old_val.strip(',') + ',{}'.format(workflow_id)
+                    app_token_obj[0].save()
+                    return Response({'msg': 'change success'}, status=200)
+        return Response({'msg': 'params error'}, status=400)
 
 
 @method_decorator(login_required, name='dispatch')

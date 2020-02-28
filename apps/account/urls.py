@@ -4,11 +4,12 @@ from django.conf.urls import include
 from rest_framework.routers import DefaultRouter
 
 from apps.account.views import LoonUserView, LoonRoleView, LoonDeptView, LoonAppTokenView, LoonAppTokenDetailView, \
-    LoonLoginView, LoonLogoutView, LoonUserRoleView, LoonRoleUserView, CreateUserViewSet
+    LoonLoginView, LoonLogoutView, LoonUserRoleView, LoonRoleUserView, CreateUserViewSet, AddWorkFlowIdToAppTokenViewSet
 
 router = DefaultRouter()
 
 router.register(r'create-user', CreateUserViewSet, basename="create-user")
+router.register(r'add-workflow_id-to-app_token', AddWorkFlowIdToAppTokenViewSet, basename="add-workflow_id-to-app_token")
 
 urlpatterns = [
     path(r'/mcenter-dev/', include(router.urls)),
