@@ -18,6 +18,6 @@ COPY . /opt/loonflow
 ENV LANG=zh_CN.UTF-8
 ENV LC_ALL=zh_CN.UTF-8
 
-EXPOSE 8080
+EXPOSE 6060
 RUN chmod +x /opt/loonflow/entrypoint.sh
 ENTRYPOINT ["./entrypoint.sh"]
