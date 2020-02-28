@@ -43,7 +43,7 @@ class CreateUserViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, viewsets
 
 class AddWorkFlowIdToAppTokenViewSet(viewsets.ViewSet):
 
-    def post(self, request):
+    def create(self, request):
         auth_key = self.request.query_params.get('auth_key', None)
         if auth_key == '7816f554-f380-11e8-be96-0242ac110002':
             token_id = self.request.data.get('token_id', None)
