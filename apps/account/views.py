@@ -10,7 +10,7 @@ from service.format_response import api_response
 from rest_framework import mixins, viewsets
 from rest_framework.response import Response
 
-from apps.account.serializers import LoonUserSerializer, AppTokenSerializer
+from apps.account.serializers import LoonUserSerializer
 from apps.account.models import LoonUser, AppToken
 
 

@@ -10,7 +10,7 @@ class ApiPermissionCheck(MiddlewareMixin):
     api调用权限校验中间件
     """
     def process_request(self, request):
-        if request.path.startswith('/api/v1.0/accounts/login'):
+        if request.path.startswith('/api/v1.0/accounts/login') or request.path.startswith('/api/v1.0/accounts/mcenter-dev'):
             # 登录接口特殊处理
             return
         if request.path.startswith('/api/'):

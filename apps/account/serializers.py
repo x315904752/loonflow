@@ -8,10 +8,3 @@ class LoonUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = LoonUser
         fields = '__all__'
-
-
-class AppTokenSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = AppToken
-        fields = '__all__'
