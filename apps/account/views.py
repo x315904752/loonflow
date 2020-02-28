@@ -52,7 +52,7 @@ class AddWorkFlowIdToAppTokenViewSet(viewsets.ViewSet):
                 app_token_obj = AppToken.objects.filter(id__exact=int(token_id))
                 if app_token_obj:
                     old_val = app_token_obj[0].workflow_ids
-                    app_token_obj[0].workflow_ids = old_val.strip(',') + ',{}'.format(workflow_id)
+                    app_token_obj[0].workflow_ids = (old_val.strip(',') + ',{}'.format(workflow_id)).strip(',')
                     app_token_obj[0].save()
                     return Response({'msg': 'change success'}, status=200)
         return Response({'msg': 'params error'}, status=400)
