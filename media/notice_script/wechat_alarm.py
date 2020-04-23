@@ -9,7 +9,7 @@ import urllib
 import requests
 from Crypto.Cipher import AES, DES3
 
-mcenter_url = os.environ.get('mcenter_url', None)
+mcenter_url = os.environ.get('MCENTER_URL', None)
 
 
 def password_to_str(password):
