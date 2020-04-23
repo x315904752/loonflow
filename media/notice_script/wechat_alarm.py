@@ -85,7 +85,7 @@ headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36",
 }
 
-ticket_mc = requests.request(method="GET", url=work_url + str(last_flow_log['ticket_id']), headers=headers).json()
+ticket_mc = requests.request(method="GET", url=work_url + str(last_flow_log['ticket_id']) + '/', headers=headers).json()
 ticket_mc = ticket_mc['data']['value']
 alarm_level_option = {"0":"未分类","1":"信息","2":"警告","3":"一般严重","4":"严重","5":"灾难"}
 
@@ -98,7 +98,6 @@ if True:
     alarm_level = ''
     event_status = ''
     alarm_id = ''
-    duty_member = ''
     for i in ticket_mc['field_list']:
         if i['field_key'] == 'host_ip':
             ip_addr = i['field_value']
@@ -108,17 +107,13 @@ if True:
             event_status = i['field_value']
         elif i['field_key'] == 'event_id':
             alarm_id = str(i['field_value'])
-        elif i['field_key'] == 'handler' and i['field_value']:
-            user_mc = requests.request(method="GET", url=user_url + i['field_value'], headers=headers).json()
-            duty_member = user_mc['results'][0]['name']
 
     description = """告警内容: {}
 告警时间: 【{}】
 主机地址: 【{}】
 告警等级: 【{}】
 当前状态: 【{}】
-告警编号: 【{}】
-值班人员: 【{}】""".format(ticket_mc['title'], ticket_mc['gmt_created'], ip_addr, alarm_level, event_status, alarm_id, duty_member)
+告警编号: 【{}】""".format(ticket_mc['title'], ticket_mc['gmt_created'], ip_addr, alarm_level, event_status, alarm_id)
     if len(wechat_list):
         wechat_info = wechat_list[0]
         wechat = Wechat(AgentId=wechat_info['AgentId'],
