@@ -1,3 +1,4 @@
+#! /usr/bin/python3
 # -*- coding: utf-8 -*-
 import os
 import time
@@ -8,6 +9,7 @@ import json
 import urllib
 import requests
 from Crypto.Cipher import AES, DES3
+from service.workflow.workflow_state_service import WorkflowStateService
 
 mcenter_url = os.environ.get('MCENTER_URL', None)
 
@@ -89,8 +91,8 @@ ticket_mc = requests.request(method="GET", url=work_url + str(last_flow_log['tic
 ticket_mc = ticket_mc['data']['value']
 alarm_level_option = {"0":"未分类","1":"信息","2":"警告","3":"一般严重","4":"严重","5":"灾难"}
 
-# if ticket_mc['state_id'] == 10245:
-if True:
+state, msg = WorkflowStateService.get_workflow_state_by_id(ticket_mc['state_id'])
+if state.name == '运维人员处理':
     project_id = ticket_mc['to_project']['id']
     params = {'to_project':project_id}
     wechat_list = requests.request(method="GET", url=url, params=params, headers=headers).json()
