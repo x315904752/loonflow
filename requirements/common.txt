@@ -9,4 +9,5 @@ djangorestframework==3.11.0
 simplejson
 pycrypto==2.6.1
 pyzabbix==0.7.5
+jinja2==2.11.2
 uwsgi
