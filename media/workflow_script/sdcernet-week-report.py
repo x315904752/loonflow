@@ -74,39 +74,39 @@ def conversion_time(start_time, end_time):
     return total_time
 
 
+def regular_matching(lnk, reg_mat):
+    if lnk == 'link':
+        rmg_list = re.findall(r'/(.*?)链路中断', reg_mat)[0].split("-")[1]
+    else:
+        rmg_list = re.findall(r'^【(.*?)】', reg_mat)[0]
+
+    return rmg_list
+
+
 def link_visit_state(ip_addr, port, start_time, end_time):
     """
     	报表
     """
-    rep_lk = requests.request(method='get',
-                              url='http://{0}:{1}/v1/asset/net-flow-network-card/?to_net_flow_asset__to_net_flow_node__to_project=20&page=1&search=bps&page_size=20'.format(
-                                  ip_addr, port), headers=headers)
+    rep_lk = requests.request(method='get', url='http://{0}:{1}/v1/asset/net-flow-network-card/?to_net_flow_asset__to_net_flow_node__to_project=20&page=1&search=bps&page_size=20'.format(ip_addr, port), headers=headers)
 
-    final_results = {}  # 最后返回结果
-    totals_times = conversion_time(start_time, end_time)  # 总时间（秒）数
+    final_results = {}               # 最后返回结果
+    totals_times = conversion_time(start_time, end_time)        # 总时间（秒）数
 
     for lnk in ['link', 'visit']:
-        link_visit_data = []  # 存储数据
-        outage_time = 0  # 中断 异常 持续时间
+        link_visit_data = []          # 存储数据
+        outage_time = 0               # 中断 异常 持续时间
+        top_list_data = []            # 最后返回 top 数据(列表)
+        top_dict_data = {}            # 记录 top 数据(字典)
+        top_count = 0                 # top 计数 取前10
         query_criteria = [
-            {'search': [{'key': "gmt_created", 'action': "gte", 'value': "{}".format(start_time)},
-                        {'key': "new_end_time", 'action': "lte", 'value': "{}".format(end_time)},
-                        {'key': "to_project_name", 'action': "eq", 'value': '"山东教育网省网运维"'}], "page": 1,
-             "page_size": 10000},
-            {'search': [{'key': "gmt_created", 'action': "lte", 'value': "{}".format(start_time)},
-                        {'key': "new_end_time", 'action': "gte", 'value': "{}".format(start_time)},
-                        {'key': "new_end_time", 'action': "lte", 'value': "{}".format(end_time)},
-                        {'key': "to_project_name", 'action': "eq", 'value': '"山东教育网省网运维"'}], "page": 1,
-             "page_size": 10000},
-            {'search': [{'key': "gmt_created", 'action': "gte", 'value': "{}".format(start_time)},
-                        {'key': "gmt_created", 'action': "lte", 'value': "{}".format(end_time)},
-                        {'key': "new_end_time", 'action': "gte", 'value': "{}".format(end_time)},
-                        {'key': "to_project_name", 'action': "eq", 'value': '"山东教育网省网运维"'}], "page": 1,
-             "page_size": 10000},
-            {'search': [{'key': "gmt_created", 'action': "lte", 'value': "{}".format(start_time)},
-                        {'key': "new_end_time", 'action': "gte", 'value': "{}".format(end_time)},
-                        {'key': "to_project_name", 'action': "eq", 'value': '"山东教育网省网运维"'}], "page": 1,
-             "page_size": 10000}
+            {'search': [{'key': "gmt_created", 'action': "gte", 'value': "{}".format(start_time)}, {'key': "new_end_time", 'action': "lte", 'value': "{}".format(end_time)},
+                        {'key': "to_project_name", 'action': "eq", 'value': '"山东教育网省网运维"'}], "page": 1, "page_size": 10000},
+            {'search': [{'key': "gmt_created", 'action': "lte", 'value': "{}".format(start_time)}, {'key': "new_end_time", 'action': "gte", 'value': "{}".format(start_time)},
+                        {'key': "new_end_time", 'action': "lte", 'value': "{}".format(end_time)}, {'key': "to_project_name", 'action': "eq", 'value': '"山东教育网省网运维"'}], "page": 1, "page_size": 10000},
+            {'search': [{'key': "gmt_created", 'action': "gte", 'value': "{}".format(start_time)}, {'key': "gmt_created", 'action': "lte", 'value': "{}".format(end_time)},
+                        {'key': "new_end_time", 'action': "gte", 'value': "{}".format(end_time)}, {'key': "to_project_name", 'action': "eq", 'value': '"山东教育网省网运维"'}], "page": 1, "page_size": 10000},
+            {'search': [{'key': "gmt_created", 'action': "lte", 'value': "{}".format(start_time)}, {'key': "new_end_time", 'action': "gte", 'value': "{}".format(end_time)},
+                        {'key': "to_project_name", 'action': "eq", 'value': '"山东教育网省网运维"'}], "page": 1, "page_size": 10000}
         ]
         for index, value in enumerate(query_criteria):
             if lnk == 'link':
@@ -115,31 +115,56 @@ def link_visit_state(ip_addr, port, start_time, end_time):
                 value['search'].append({'key': 'title', 'action': 'eq', 'value': '"访问异常"'})
 
             search_info_link = simplejson.dumps(value)
-            resp_link = requests.request(method='post', url='http://%s:%s/v1/alarm/alarmlist/' % (ip_addr, port),
-                                         data=search_info_link, headers=headers)
+            resp_link = requests.request(method='post', url='http://%s:%s/v1/alarm/alarmlist/' % (ip_addr, port), data=search_info_link, headers=headers)
 
             for value in json.loads(resp_link.text)["results"]:
-                link_visit_data.append({"title": value.get("title", ""), "gmt_created": value.get("gmt_created", ""),
-                                        "duration": value.get("duration", ""),
-                                        "end_time": value.get("new_end_time", ""),
-                                        "results ": value.get("results", "")})
+                if "访问异常" in value.get("title", ""):
+                   if value.get("duration", "") < "0小时12分钟00秒":
+                      continue
+                   if value.get("gmt_created", "").split('T')[1] > "22:00:00" or value.get("gmt_created", "").split('T')[1] < "08:00:00":
+                      continue
+                link_visit_data.append({"title": value.get("title", ""), "gmt_created": value.get("gmt_created", "").replace("T", " "), "duration": value.get("duration", ""), "end_time": value.get("new_end_time", "").replace("T", " "), "results ": value.get("results", "")})
 
                 if index == 0:
-                    outage_time += conversion_time(value.get("gmt_created", ""), value.get("new_end_time", ""))
+                    record_time = conversion_time(value.get("gmt_created", ""), value.get("new_end_time", ""))
+                    mch = regular_matching(lnk, value.get("title", ""))
+                    top_dict_data[mch] = top_dict_data.get(mch, 0) + record_time
                 elif index == 1:
-                    outage_time += conversion_time(start_time, value.get("new_end_time", ""))
+                    record_time = conversion_time(start_time, value.get("new_end_time", ""))
+                    mch = regular_matching(lnk, value.get("title", ""))
+                    top_dict_data[mch] = top_dict_data.get(mch, 0) + record_time
                 elif index == 2:
-                    outage_time += conversion_time(value.get("gmt_created", ""), end_time)
+                    record_time = conversion_time(value.get("gmt_created", ""), end_time)
+                    mch = regular_matching(lnk, value.get("title", ""))
+                    top_dict_data[mch] = top_dict_data.get(mch, 0) + record_time
                 elif index == 3:
-                    outage_time += conversion_time(start_time, end_time)
-
+                    record_time = conversion_time(start_time, end_time)
+                    mch = regular_matching(lnk, value.get("title", ""))
+                    top_dict_data[mch] = top_dict_data.get(mch, 0) + record_time
+                outage_time += record_time
+        after = dict(sorted(top_dict_data.items(), key=lambda x: x[1], reverse=False))
         final_results[lnk] = link_visit_data
         if lnk == 'link':
-            final_results["{}_availability".format(lnk)] = format(
-                (totals_times - outage_time / json.loads(rep_lk.text)['count']) / totals_times * 100, '.2f')
+            for kat, vat in after.items():
+                 top_count += 1
+                 if top_count > 10:
+                     break
+                 top_list_data.append({"name": kat, "value": format((totals_times - vat) / totals_times * 100,'.2f')})
+            final_results["{}_top".format(lnk)] = top_list_data
+            final_results["{}_availability".format(lnk)] = format((totals_times - outage_time/json.loads(rep_lk.text)['count']) / totals_times * 100,'.2f')
         else:
-            final_results["{}_availability".format(lnk)] = format(
-                (totals_times - outage_time / 112) / totals_times * 100, '.2f')
+            for kat, vat in after.items():
+                 top_count += 1
+                 if top_count > 10:
+                     break
+                 kek = kat.split("-首页-")
+                 top_list_data.append({"name": kek[0], "url": "http://" + kek[1], "value": format((totals_times - vat) / totals_times * 100,'.2f')})
+            final_results["{}_top".format(lnk)] = top_list_data
+            final_results["{}_availability".format(lnk)] = format((totals_times - outage_time/112) / totals_times * 100,'.2f')
+    final_results['start_time'] = start_time
+    final_results['end_time'] = end_time
+    final_results['link_count'] = len(final_results['visit'])
+    final_results['visit_count'] = len(final_results['link'])
     return final_results
 
 
@@ -156,11 +181,11 @@ for i in reslist:
         end_time = i['field_value']
 
 
-
 def generate_html(data):
     env = Environment(loader=FileSystemLoader('/opt/loonflow/media/workflow_script/templates'))  # 加载模板
     template = env.get_template('cernet-week-report.html')
     return template.render(data=data)
+
 
 TicketBaseService.update_ticket_custom_field(ticket_id, {"report_forms": str(generate_html(link_visit_state(ip_addr, port, start_time, end_time)))})
 a = requests.patch('http://10.254.50.230:31001/v1/report/changeticketfield/%s/' % (ticket_id), data=simplejson.dumps({"participant": '', 'state_name': '结束'}), headers=headers)

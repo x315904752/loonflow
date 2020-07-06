@@ -14,7 +14,10 @@ from apps.account.serializers import LoonUserSerializer
 from apps.account.models import LoonUser, AppToken
 
 
-class CreateUserViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet):
+class CreateUserViewSet(mixins.CreateModelMixin,
+                        mixins.ListModelMixin,
+                        mixins.UpdateModelMixin,
+                        viewsets.GenericViewSet):
     queryset = LoonUser.objects.all()
     serializer_class = LoonUserSerializer
 
@@ -37,8 +40,11 @@ class CreateUserViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, viewsets
         auth_key = self.request.query_params.get('auth_key', None)
         if auth_key == '7816f554-f380-11e8-be96-0242ac110002':
             serializer.save()
-        else:
-            return Response('params error')
+
+    def perform_update(self, serializer):
+        auth_key = self.request.query_params.get('auth_key', None)
+        if auth_key == '7816f554-f380-11e8-be96-0242ac110002':
+            serializer.save()
 
 
 class AddWorkFlowIdToAppTokenViewSet(viewsets.ViewSet):
